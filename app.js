@@ -176,7 +176,7 @@ const allProducts = document.getElementById("allProducts");
 
 // To fetch Api in JS , their are two methods , First -> Promise ✔ , Second -> Async Await
 
-fetchProducts("https://fakestoreapi.com/products");
+fetchProducts("https://dummyjson.com/products");
 
 function fetchProducts(url) {
   fetch(url)
@@ -184,7 +184,8 @@ function fetchProducts(url) {
       return data.json();
     })
     .then(function (data) {
-      displayData(data);
+      console.log(data)
+      displayData(data.products);
       displayProducts(data);
     })
     .catch(function (err) {
@@ -199,7 +200,7 @@ function displayData(arr) {
     <div class="max-w-md mx-auto bg-white shadow-md overflow-hidden md:max-w-2xl p-2">
     <h2 class="text-2xl font-semibold text-gray-800 p-4">${arr[i].title}</h2>
     <img src=${
-      arr[i].image
+      arr[i].images[1]
     } class="w-full h-60  object-fit" alt="Product Image">
     <div class="p-4">
         <h3 class="text-lg font-semibold text-gray-700">${Math.floor(
@@ -215,7 +216,7 @@ function displayData(arr) {
   }
 }
 function displayProducts(arr) {
-  console.log(arr);
+  // console.log(arr);
   for (let i = 0; i < arr.length; i++) {
     allProducts.innerHTML += `
     
