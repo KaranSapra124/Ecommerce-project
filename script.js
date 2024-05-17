@@ -51,15 +51,50 @@ function fetchSingleProduct(url) {
       return data.json();
     })
     .then(function (data) {
+      console.log(data);
       displayIndividualProduct(data);
     });
 }
 
 function displayIndividualProduct(obj) {
   productDesc.innerHTML = `
-  <div>
-  <img src=${obj.images[0]} alt="No Image" />
-  <h1>${obj.title}</h1>
+  
+ <div> <img  src=${obj.images[0]} />
+ <button class="bg-yellow-400 p-2 mt-2 rounded text-white font-semibold hover:bg-yellow-500" hover:>Add to Cart </button>
+  
+ <button class="bg-green-400 p-2 mt-2 rounded text-white font-semibold hover:bg-green-500" hover:>Buy Now </button>
+ </div>
+  <div class="flex flex-col">
+
+  <h1 class="mb-2 text-3xl">${obj.title}</h1>
+  <span class="${
+    obj.rating < 5
+      ? "bg-green-500 text-white w-fit  p-1 rounded "
+      : "text-white  p-1 bg-green-600"
+  }">
+  ⭐ ${obj.rating}
+</span>
+<div class="flex items-center">
+<p class="text-2xl font-semibold" >₹${
+    obj.discountPercentage
+      ? Math.round(
+          obj.price - (obj.price * Math.round(obj.discountPercentage)) / 100
+        )
+      : obj.price
+  }</p>
+<p class="${
+    obj.discountPercentage ? "line-through mx-2 text-gray-400" : "hidden"
+  }" >₹${obj.price}</p>
+  <span class="${
+    obj.discountPercentage ? " mx-2 text-green-500 font-semibold" : "hidden"
+  }">${Math.round(obj.discountPercentage)}% Off</span>
+
+</div>
+<div><span class="font-bold mx-2">Description:</span>${obj.description}</div>
+
+
+  
+
 
 
 
