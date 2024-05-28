@@ -1,6 +1,11 @@
 const allProducts = document.getElementById("allProducts");
 const productDesc = document.getElementById("productDesc");
 const similarProducts = document.getElementById("similarProducts");
+const cart = document.getElementById("cart");
+const selectFilter = document.getElementById("selectFilter");
+const searchInp = document.getElementById("searchInp");
+let cartArr = [];
+let productArr = [];
 const id = new URLSearchParams(window.location.search);
 const val = id.get("id");
 let productCategory = "";
@@ -16,6 +21,8 @@ function fetchProducts(url) {
     })
     .then(function (data) {
       // console.log(data, "DATA");
+
+      productArr.push(...data.products);
       displayProducts(data.products);
     })
     .catch(function (err) {
@@ -25,6 +32,8 @@ function fetchProducts(url) {
 
 function displayProducts(arr) {
   // console.log(arr[0].images, "ARR");
+  allProducts.innerHTML = "";
+  console.log(arr);
   for (let i = 0; i < arr.length; i++) {
     allProducts.innerHTML += `
       
@@ -65,7 +74,9 @@ function displayIndividualProduct(obj) {
   productDesc.innerHTML = `
   
  <div> <img  src=${obj.thumbnail} />
- <button class="bg-yellow-400 p-2 mt-2 rounded text-white font-semibold hover:bg-yellow-500" hover:>Add to Cart </button>
+ <button class="bg-yellow-400 p-2 mt-2 rounded text-white font-semibold hover:bg-yellow-500" onclick="AddToCart('${
+   obj.thumbnail
+ }','${obj.title}',${obj.price},${obj.rating})">Add to Cart </button>
   
  <button class="bg-green-400 p-2 mt-2 rounded text-white font-semibold hover:bg-green-500" hover:>Buy Now </button>
  </div>
@@ -131,7 +142,9 @@ const displayRelatedProducts = (arr) => {
     return elem.id !== +val;
   });
   filteredArr.map((elem) => {
-    return (similarProducts.innerHTML += `<div>
+    return (similarProducts.innerHTML += `
+    <a href='../productPage.html?id=${elem.id}'>
+    <div>
     <img class="w-52 h-52 object-cover" src='${elem?.thumbnail}'/>
     <h3>${elem.title}</h3>
     <span class="${
@@ -155,8 +168,79 @@ const displayRelatedProducts = (arr) => {
     elem.discountPercentage ? " mx-2 text-green-500 font-semibold" : "hidden"
   }">${Math.round(elem.discountPercentage)}% Off</span>
 
-    </div>`);
+    </div>
+    </a>`);
   });
 };
 
-// Students data school
+const AddToCart = (prodImg, prodTitle, prodPrice, prodRating) => {
+  const prodObj = {
+    prodImg: prodImg,
+    prodTitle: prodTitle,
+    prodPrice: prodPrice,
+    prodRating: prodRating,
+  };
+  if (localStorage.getItem("cart")) {
+    const cartData = JSON.parse(localStorage.getItem("cart"));
+    cartData.push(prodObj);
+    localStorage.setItem("cart", JSON.stringify(cartData));
+  } else {
+    cartArr.push(prodObj);
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+  }
+  // Create
+
+  // Store
+};
+
+const getCart = () => {
+  const cartData = JSON.parse(localStorage.getItem("cart"));
+  console.log(cartData);
+  cartData.map((elem, index) => {
+    return (cart.innerHTML += `
+    <div class="bg-white shadow-lg rounded-lg p-4 max-w-sm mx-auto">
+    <h1 class="text-xl font-semibold mb-2">${elem.prodTitle}</h1>
+    <img src="${
+      elem.prodImg
+    }" alt="Product Image" class="w-full h-48 object-cover rounded mb-4" />
+    <div class="flex items-center justify-between">
+      <p class="text-lg font-bold text-gray-800">₹${Math.round(
+        elem.prodPrice
+      )}</p>
+      <span class="${
+        elem.prodRating < 5
+          ? "bg-green-500 text-white px-2 py-1 rounded"
+          : "bg-green-600 text-white px-2 py-1 rounded"
+      }">
+        ⭐ ${elem.prodRating}
+      </span>
+    </div>
+  </div>
+    `);
+  });
+};
+
+if (window.location.pathname.includes("/cart.html")) {
+  getCart();
+}
+
+selectFilter.addEventListener("change", () => {
+  filterByCategory(productArr, selectFilter.value);
+});
+
+searchInp.addEventListener("change", (e) => {
+  filterBySearch(productArr, e.target.value);
+});
+
+const filterByCategory = (arr, category) => {
+  const filteredArr = arr.filter((elem) => {
+    return elem.category == category;
+  });
+  displayProducts(filteredArr);
+};
+const filterBySearch = (arr, searchTxt) => {
+  const searchArr = arr.filter((elem) => {
+    return elem.title.includes(searchTxt);
+  });
+  displayProducts(searchArr);
+};
