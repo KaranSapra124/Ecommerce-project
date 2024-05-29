@@ -4,6 +4,7 @@ const similarProducts = document.getElementById("similarProducts");
 const cart = document.getElementById("cart");
 const selectFilter = document.getElementById("selectFilter");
 const searchInp = document.getElementById("searchInp");
+const cartDetails = document.getElementById("cartDetails");
 let cartArr = [];
 let productArr = [];
 const id = new URLSearchParams(window.location.search);
@@ -122,6 +123,10 @@ function displayIndividualProduct(obj) {
   `;
 }
 
+if (productDesc) {
+  fetchSingleProduct(`https://dummyjson.com/products/${val}`);
+}
+
 const fetchProductsByCategory = (url) => {
   fetch(url)
     .then((data) => {
@@ -134,8 +139,6 @@ const fetchProductsByCategory = (url) => {
       console.log(err);
     });
 };
-
-fetchSingleProduct(`https://dummyjson.com/products/${val}`);
 
 const displayRelatedProducts = (arr) => {
   const filteredArr = arr.filter((elem) => {
@@ -195,17 +198,19 @@ const AddToCart = (prodImg, prodTitle, prodPrice, prodRating) => {
 
 const getCart = () => {
   const cartData = JSON.parse(localStorage.getItem("cart"));
-  console.log(cartData);
+  let total = cartData.reduce((acc, curr) => {
+    return acc + Math.round(curr.prodPrice * 80);
+  }, 0);
   cartData.map((elem, index) => {
     return (cart.innerHTML += `
-    <div class="bg-white shadow-lg rounded-lg p-4 max-w-sm mx-auto">
+    <div class="bg-white shadow-lg rounded-lg p-4 max-w-sm mx-auto w-52">
     <h1 class="text-xl font-semibold mb-2">${elem.prodTitle}</h1>
     <img src="${
       elem.prodImg
     }" alt="Product Image" class="w-full h-48 object-cover rounded mb-4" />
     <div class="flex items-center justify-between">
       <p class="text-lg font-bold text-gray-800">₹${Math.round(
-        elem.prodPrice
+        elem.prodPrice * 80
       )}</p>
       <span class="${
         elem.prodRating < 5
@@ -218,17 +223,25 @@ const getCart = () => {
   </div>
     `);
   });
+  cartDetails.innerHTML = `<div class="bg-white p-4 rounded" >
+  <h3 class="font-semibold">Price Details</h3>
+  <hr class="mb-2"/>
+  <p class="flex justify-between mb-4">Price (${cartData.length} items) <span>${total}</span></p>
+  <p  class="flex justify-between w-52 mb-4">Delivery Charges <span>${total < 1000 ? 40 : "Free"}</span></p>
+  <hr/>
+  <p class="flex justify-between w-52 font-bold">Total <span>${total}</span></p>
+  </div>`;
 };
 
-if (window.location.pathname.includes("/cart.html")) {
+if (window.location.pathname.includes("/Cart.html")) {
   getCart();
 }
 
-selectFilter.addEventListener("change", () => {
+selectFilter?.addEventListener("change", () => {
   filterByCategory(productArr, selectFilter.value);
 });
 
-searchInp.addEventListener("change", (e) => {
+searchInp?.addEventListener("change", (e) => {
   filterBySearch(productArr, e.target.value);
 });
 
