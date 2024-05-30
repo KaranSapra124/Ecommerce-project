@@ -12,7 +12,7 @@ const val = id.get("id");
 let productCategory = "";
 
 if (allProducts) {
-  fetchProducts("https://dummyjson.com/products");
+  fetchProducts("https://dummyjson.com/products?limit=100");
 }
 
 function fetchProducts(url) {
@@ -35,26 +35,27 @@ function displayProducts(arr) {
   // console.log(arr[0].images, "ARR");
   allProducts.innerHTML = "";
   console.log(arr);
-  for (let i = 0; i < arr.length; i++) {
-    allProducts.innerHTML += `
+  const filterArr = arr.filter((elem) => elem.category !== "groceries");
+  filterArr.map((elem) => {
+    return (allProducts.innerHTML += `
       
-     <a href='../productPage.html?id=${arr[i].id}'>
-     
-     <div class="max-w-md mx-auto bg-white shadow-md overflow-hidden md:max-w-2xl p-2">
-     <h2 class="text-2xl font-semibold text-gray-800 p-4">${arr[i].title}</h2>
-     <img src=${
-       arr[i].images[0]
-     } class="w-full h-60  object-fit" alt="Product Image">
-     <div class="p-4">
-         <h3 class="text-lg font-semibold text-gray-700">${Math.floor(
-           arr[i].price
-         )}</h3>
-         <h4 class="text-sm text-gray-600">${arr[i].category}</h4>
-     </div>
- </div>
-     
-     </a>`;
-  }
+    <a href='../productPage.html?id=${elem.id}'>
+    
+    <div class="max-w-md  mx-auto bg-white shadow-md overflow-hidden md:max-w-2xl p-2">
+    <h2 class="text-2xl font-semibold text-gray-800 p-4">${elem.title}</h2>
+    <img src=${
+      elem.images[0]
+    } class="w-full h-52 object-fit  object-fit" alt="Product Image">
+    <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-700">${Math.floor(
+          elem.price
+        )}</h3>
+        <h4 class="text-sm text-gray-600">${elem.category}</h4>
+    </div>
+</div>
+    
+    </a>`);
+  });
 }
 
 function fetchSingleProduct(url) {
@@ -74,7 +75,7 @@ function displayIndividualProduct(obj) {
   );
   productDesc.innerHTML = `
   
- <div> <img  src=${obj.thumbnail} />
+ <div  > <img  src=${obj.thumbnail} />
  <button class="bg-yellow-400 p-2 mt-2 rounded text-white font-semibold hover:bg-yellow-500" onclick="AddToCart('${
    obj.thumbnail
  }','${obj.title}',${obj.price},${obj.rating})">Add to Cart </button>
@@ -226,8 +227,12 @@ const getCart = () => {
   cartDetails.innerHTML = `<div class="bg-white p-4 rounded" >
   <h3 class="font-semibold">Price Details</h3>
   <hr class="mb-2"/>
-  <p class="flex justify-between mb-4">Price (${cartData.length} items) <span>${total}</span></p>
-  <p  class="flex justify-between w-52 mb-4">Delivery Charges <span>${total < 1000 ? 40 : "Free"}</span></p>
+  <p class="flex justify-between mb-4">Price (${
+    cartData.length
+  } items) <span>${total}</span></p>
+  <p  class="flex justify-between w-52 mb-4">Delivery Charges <span>${
+    total < 1000 ? 40 : "Free"
+  }</span></p>
   <hr/>
   <p class="flex justify-between w-52 font-bold">Total <span>${total}</span></p>
   </div>`;
